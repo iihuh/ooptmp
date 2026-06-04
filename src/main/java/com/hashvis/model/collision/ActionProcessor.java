@@ -12,10 +12,13 @@ abstract class ActionProcessor extends HashResolver{
   	protected String key;
   	protected Table table;
 
+	private  boolean checkpoint=true;
+
 	abstract protected String 	getcurrent_ResolverType();
 	abstract protected void 	uniqueInitalize(HashAction action);
-	abstract protected Result  	handleTraversal();
 	abstract protected Result  	firstStep();
+	abstract protected Result   searching();
+	abstract protected Result   processInsertion();
 	protected String initalizePseudocode(){	return "step = 0 ; i = base =hash(k,n)";}
 	protected ArrayList<String> caseInsert(){
 		ArrayList<String> pseudocode = new ArrayList<String>();
@@ -60,19 +63,23 @@ abstract class ActionProcessor extends HashResolver{
 	public List<String> getAlgorithmAndInitalize(HashAction action, String key, Table table) {
 		this.key = key;
 		this.table = table;
+		checkpoint=true;
 		return getAlgorithm(action);
 	}
 	protected ArrayList<String> getAlgorithm(HashAction action) {
+		checkpoint=true;
 		uniqueInitalize(action);
 	    return getPseudocode(action);
 	}
 	@Override
   	public Result nextStep() {
-		System.out.println("1");
-    	Result initialization = firstStep();
-    	if(initialization!=null){
-      		return initialization;
-    	}
-    	return handleTraversal();
+    	Result tmp = firstStep();
+		if(tmp != null){return tmp;}
+		if(checkpoint){
+			tmp = searching();
+			if(tmp != null){return tmp;}
+		}
+		checkpoint=false;
+		return processInsertion();
   	}
 }

@@ -70,7 +70,7 @@ public class SeparateChaining extends ActionProcessor {
     return new Result("Accessing bucket index " + hashValue, 0);
   }
   @Override
-  protected Result handleTraversal() {
+  protected Result searching() {
     // If we don't have an item yet, or we just finished one, get the next
     if (currentItem == null )
       currentItem = currentRow.nextItem();
@@ -86,6 +86,10 @@ public class SeparateChaining extends ActionProcessor {
     Item itemToHighlight = currentItem;
     currentItem = null; // Reset so next call to handleTraversal calls nextItem()
     return new Result("Checking item: " + itemToHighlight.getName() + " (No match)", 0);
+  }
+  @Override
+  protected Result processInsertion(){
+    return new Result("Error:Faker, what was that " , -1);
   }
   private Result processFoundItem() {
     if (action == HashAction.INSERT) {
