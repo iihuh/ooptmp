@@ -6,10 +6,9 @@ import com.hashvis.model.hashfunc.HashFunction;
 import com.hashvis.model.table.Item;
 import com.hashvis.model.table.Row;
 import java.util.ArrayList;
-public class SeparateChaining extends ActionProcessor {
+public class SeparateChaining extends CollisionStrategyController {
   private Item currentItem = null;
   private HashFunction hashFunc;
-  private HashAction action;
   private Integer hashValue = null;
   private Row currentRow = null;
   @Override
@@ -17,7 +16,11 @@ public class SeparateChaining extends ActionProcessor {
     return true;
   }
   @Override 
-  protected String initalizePseudocode(){return "i=hash(k,n), chain = HT_SC[i]";}
+  protected ArrayList<String> initalizePseudocode(){
+    ArrayList<String> pseudocode = new ArrayList<String>();
+    pseudocode.add("i=hash(k,n), chain = HT_SC[i]");
+    return pseudocode;
+  }
   @Override
   protected String getcurrent_ResolverType(){
     return "chain = chain.next";
@@ -70,7 +73,7 @@ public class SeparateChaining extends ActionProcessor {
     return new Result("Accessing bucket index " + hashValue, 0);
   }
   @Override
-  protected Result handleTraversal() {
+  protected Result searching() {
     // If we don't have an item yet, or we just finished one, get the next
     if (currentItem == null )
       currentItem = currentRow.nextItem();
@@ -87,6 +90,10 @@ public class SeparateChaining extends ActionProcessor {
     currentItem = null; // Reset so next call to handleTraversal calls nextItem()
     return new Result("Checking item: " + itemToHighlight.getName() + " (No match)", 0);
   }
+  @Override
+  protected Result processInsertion(){
+    return new Result("Key not found. Inserted " + key + " into bucket " + hashValue, -1);
+  }
   private Result processFoundItem() {
     if (action == HashAction.INSERT) {
       return new Result("Error: Duplicate key " + key, -1);
@@ -100,7 +107,7 @@ public class SeparateChaining extends ActionProcessor {
   private Result handleFinalization() {
     if (action == HashAction.INSERT) {
       currentRow.addItem(key);
-      return new Result("Key not found. Inserted " + key + " into bucket " + hashValue, -1);
+      return null;
     }
     return new Result("Error: Key " + key + " not found in table", -1);
   }

@@ -6,7 +6,7 @@ public class QuadraticProbing extends OpenAddressing  {
     return " i = (base + step**2) % size of HT";
   }
   @Override
-  protected int handleBucketSelection(int probeCount) {
-    return probeCount*probeCount;
+  protected int handleBucketSelection(int hashValue, int probeCount) {
+    return (hashValue+probeCount*probeCount)%table.size();
   }
 }

@@ -1,8 +1,9 @@
 package com.hashvis.model.collision;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.hashvis.model.hashfunc.HashFunction;
+import com.hashvis.model.hashfunc.*;
 import com.hashvis.model.table.Table;
 
 public interface CollisionResolver {
@@ -25,7 +26,16 @@ public interface CollisionResolver {
   // Return required hash function fields and return them for Views part to show
   // it to
   // user (auto-synced with the model)
-  List<HashFunction> getHashFunctionFields(DataType dataType);
+  default List<HashFunction> getHashFunctionFields(DataType dataType) {
+    ArrayList<HashFunction> result = new ArrayList<HashFunction>();
+    HashFunction f = switch (dataType) {
+      case INTEGER -> new HashFunctionNumber();
+      case STRING -> new HashFunctionString();
+      default -> throw new IllegalArgumentException("Unsupported data type: " + dataType);
+    };
+    result.add(f);
+    return result;
+  }
 
   // Set hash function fields
   void setHashFunctionFields(List<HashFunction> fields);
